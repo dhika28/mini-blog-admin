@@ -1,112 +1,3 @@
-<template>
-  <transition name="modal">
-    <div v-if="show" class="modal-backdrop" @click.self="closeModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>{{ article ? 'Edit Article' : 'Create New Article' }}</h2>
-          <button class="close-btn" @click="closeModal">×</button>
-        </div>
-
-        <form @submit.prevent="saveArticle" class="modal-form">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="title">Title *</label>
-              <input
-                id="title"
-                v-model="formData.title"
-                type="text"
-                placeholder="Enter article title"
-                required
-                class="form-input"
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="slug">Slug *</label>
-              <input
-                id="slug"
-                v-model="formData.slug"
-                type="text"
-                placeholder="Enter article slug"
-                required
-                class="form-input"
-              />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="read_estimation">Read Estimation (minutes)</label>
-              <input
-                id="read_estimation"
-                v-model.number="formData.read_estimation"
-                type="number"
-                min="1"
-                placeholder="Estimated reading time"
-                class="form-input"
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="blog_category">Category</label>
-              <select
-                id="blog_category"
-                v-model="formData.blog_category"
-                class="form-input"
-              >
-                <option value="">Select Category</option>
-                <option
-                  v-for="cat in categories"
-                  :key="cat.id"
-                  :value="cat.id"
-                >
-                  {{ cat.name }}
-                </option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="thumbnail_url">Thumbnail URL</label>
-            <input
-              id="thumbnail_url"
-              v-model="formData.thumbnail_url"
-              type="url"
-              placeholder="https://example.com/image.jpg"
-              class="form-input"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="body">Content *</label>
-            <textarea
-              id="body"
-              v-model="formData.body"
-              placeholder="Write your article content here..."
-              rows="8"
-              required
-              class="form-textarea"
-            ></textarea>
-          </div>
-
-          <div class="form-actions">
-            <button type="button" @click="closeModal" class="btn-cancel">
-              Cancel
-            </button>
-            <button
-              type="submit"
-              :disabled="!isFormValid"
-              :class="['btn-submit', { 'disabled': !isFormValid }]"
-            >
-              {{ article ? 'Update' : 'Create' }} Article
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </transition>
-</template>
-
 <script lang="ts" setup>
 import { ref, computed, watch, onMounted } from 'vue';
 import type { Article, ArticleCreateRequest, ArticleUpdateRequest, Category } from '@/types';
@@ -227,8 +118,116 @@ onMounted(() => {
 });
 </script>
 
+<template>
+  <transition name="modal">
+    <div v-if="show" class="modal-backdrop" @click.self="closeModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>{{ article ? 'Edit Article' : 'Create New Article' }}</h2>
+          <button class="close-btn" @click="closeModal">×</button>
+        </div>
+
+        <form @submit.prevent="saveArticle" class="modal-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="title">Title *</label>
+              <input
+                id="title"
+                v-model="formData.title"
+                type="text"
+                placeholder="Enter article title"
+                required
+                class="form-input"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="slug">Slug *</label>
+              <input
+                id="slug"
+                v-model="formData.slug"
+                type="text"
+                placeholder="Enter article slug"
+                required
+                class="form-input"
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="read_estimation">Read Estimation (minutes)</label>
+              <input
+                id="read_estimation"
+                v-model.number="formData.read_estimation"
+                type="number"
+                min="1"
+                placeholder="Estimated reading time"
+                class="form-input"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="blog_category">Category</label>
+              <select
+                id="blog_category"
+                v-model="formData.blog_category"
+                class="form-input"
+              >
+                <option value="">Select Category</option>
+                <option
+                  v-for="cat in categories"
+                  :key="cat.id"
+                  :value="cat.id"
+                >
+                  {{ cat.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="thumbnail_url">Thumbnail URL</label>
+            <input
+              id="thumbnail_url"
+              v-model="formData.thumbnail_url"
+              type="url"
+              placeholder="https://example.com/image.jpg"
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="body">Content *</label>
+            <textarea
+              id="body"
+              v-model="formData.body"
+              placeholder="Write your article content here..."
+              rows="8"
+              required
+              class="form-textarea"
+            ></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" @click="closeModal" class="btn-cancel">
+              Cancel
+            </button>
+            <button
+              type="submit"
+              :disabled="!isFormValid"
+              :class="['btn-submit', { 'disabled': !isFormValid }]"
+            >
+              {{ article ? 'Update' : 'Create' }} Article
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </transition>
+</template>
+
 <style scoped>
-/* Modal styles similar to CategoryModal with purple theme */
 .modal-backdrop {
   position: fixed;
   top: 0;

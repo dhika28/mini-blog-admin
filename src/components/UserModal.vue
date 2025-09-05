@@ -1,87 +1,3 @@
-<template>
-  <transition name="modal">
-    <div v-if="show" class="modal-backdrop" @click.self="closeModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>{{ user ? 'Edit User' : 'Create New User' }}</h2>
-          <button class="close-btn" @click="closeModal">×</button>
-        </div>
-
-        <form @submit.prevent="saveUser" class="modal-form">
-          <div class="form-group">
-            <label for="username">Username *</label>
-            <input
-              id="username"
-              v-model="formData.username"
-              type="text"
-              placeholder="Enter username"
-              required
-              class="form-input"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="email">Email *</label>
-            <input
-              id="email"
-              v-model="formData.email"
-              type="email"
-              placeholder="Enter email address"
-              required
-              class="form-input"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="password">{{ user ? 'New Password' : 'Password' }} *</label>
-            <input
-              id="password"
-              v-model="formData.password"
-              type="password"
-              :placeholder="user ? 'Leave blank to keep current password' : 'Enter password'"
-              :required="!user"
-              class="form-input"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="role">Roles</label>
-            <div class="roles-grid">
-              <label
-                v-for="group in groups"
-                :key="group.id"
-                class="role-checkbox"
-              >
-                <input
-                  type="checkbox"
-                  :value="group.id"
-                  v-model="formData.role"
-                  class="checkbox-input"
-                />
-                <span class="checkbox-label">{{ group.name }}</span>
-              </label>
-            </div>
-            <small class="help-text">Select roles for this user</small>
-          </div>
-
-          <div class="form-actions">
-            <button type="button" @click="closeModal" class="btn-cancel">
-              Cancel
-            </button>
-            <button
-              type="submit"
-              :disabled="!isFormValid"
-              :class="['btn-submit', { 'disabled': !isFormValid }]"
-            >
-              {{ user ? 'Update' : 'Create' }} User
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </transition>
-</template>
-
 <script lang="ts" setup>
 import { ref, computed, watch, onMounted } from 'vue';
 import type { User, UserCreateRequest, UserUpdateRequest, Group } from '@/types';
@@ -185,8 +101,91 @@ onMounted(() => {
 });
 </script>
 
+<template>
+  <transition name="modal">
+    <div v-if="show" class="modal-backdrop" @click.self="closeModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>{{ user ? 'Edit User' : 'Create New User' }}</h2>
+          <button class="close-btn" @click="closeModal">×</button>
+        </div>
+
+        <form @submit.prevent="saveUser" class="modal-form">
+          <div class="form-group">
+            <label for="username">Username *</label>
+            <input
+              id="username"
+              v-model="formData.username"
+              type="text"
+              placeholder="Enter username"
+              required
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input
+              id="email"
+              v-model="formData.email"
+              type="email"
+              placeholder="Enter email address"
+              required
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password">{{ user ? 'New Password' : 'Password' }} *</label>
+            <input
+              id="password"
+              v-model="formData.password"
+              type="password"
+              :placeholder="user ? 'Leave blank to keep current password' : 'Enter password'"
+              :required="!user"
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="role">Roles</label>
+            <div class="roles-grid">
+              <label
+                v-for="group in groups"
+                :key="group.id"
+                class="role-checkbox"
+              >
+                <input
+                  type="checkbox"
+                  :value="group.id"
+                  v-model="formData.role"
+                  class="checkbox-input"
+                />
+                <span class="checkbox-label">{{ group.name }}</span>
+              </label>
+            </div>
+            <small class="help-text">Select roles for this user</small>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" @click="closeModal" class="btn-cancel">
+              Cancel
+            </button>
+            <button
+              type="submit"
+              :disabled="!isFormValid"
+              :class="['btn-submit', { 'disabled': !isFormValid }]"
+            >
+              {{ user ? 'Update' : 'Create' }} User
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </transition>
+</template>
+
 <style scoped>
-/* Modal styles with purple theme */
 .modal-backdrop {
   position: fixed;
   top: 0;

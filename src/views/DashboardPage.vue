@@ -1,213 +1,3 @@
-<template>
-  <div class="dashboard-container">
-    <!-- Dashboard Header -->
-    <div class="dashboard-header">
-      <div class="header-content">
-        <h1 class="dashboard-title">
-          <span class="title-icon">🚀</span>
-          Admin Dashboard
-        </h1>
-        <p class="dashboard-subtitle">Welcome to your content management system</p>
-      </div>
-      <div class="header-stats">
-        <div class="stat-card">
-          <div class="stat-icon">📁</div>
-          <div class="stat-info">
-            <div class="stat-number">{{ stats.categories }}</div>
-            <div class="stat-label">Categories</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">📄</div>
-          <div class="stat-info">
-            <div class="stat-number">{{ stats.articles }}</div>
-            <div class="stat-label">Articles</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">👥</div>
-          <div class="stat-info">
-            <div class="stat-number">{{ stats.users }}</div>
-            <div class="stat-label">Users</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
-      <div class="loading-spinner"></div>
-      <p>Loading dashboard data...</p>
-    </div>
-
-    <!-- Content when data is loaded -->
-    <div v-else>
-      <!-- Quick Actions -->
-      <div class="quick-actions">
-        <h2 class="section-title">Quick Actions</h2>
-        <div class="actions-grid">
-          <router-link to="/categories" class="action-card">
-            <div class="action-icon">📁</div>
-            <div class="action-content">
-              <h3>Manage Categories</h3>
-              <p>Organize your content categories</p>
-            </div>
-            <div class="action-arrow">→</div>
-          </router-link>
-
-          <router-link to="/articles" class="action-card">
-            <div class="action-icon">📄</div>
-            <div class="action-content">
-              <h3>Manage Articles</h3>
-              <p>Create and edit blog articles</p>
-            </div>
-            <div class="action-arrow">→</div>
-          </router-link>
-
-          <router-link to="/users" class="action-card">
-            <div class="action-icon">👥</div>
-            <div class="action-content">
-              <h3>Manage Users</h3>
-              <p>Handle user accounts and permissions</p>
-            </div>
-            <div class="action-arrow">→</div>
-          </router-link>
-
-          <div class="action-card" @click="openQuickModal">
-            <div class="action-icon">⚡</div>
-            <div class="action-content">
-              <h3>Quick Add</h3>
-              <p>Create new content quickly</p>
-            </div>
-            <div class="action-arrow">+</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Recent Activity -->
-      <div class="recent-activity">
-        <div class="activity-header">
-          <h2 class="section-title">Recent Activity</h2>
-          <button class="view-all-btn" @click="refreshData">Refresh ↻</button>
-        </div>
-
-        <div v-if="recentActivity.length === 0" class="empty-activity">
-          <div class="empty-icon">📊</div>
-          <p>No recent activity</p>
-        </div>
-
-        <div v-else class="activity-list">
-          <div
-            v-for="(activity, index) in recentActivity"
-            :key="index"
-            class="activity-item"
-          >
-            <div class="activity-icon">{{ getActivityIcon(activity.type) }}</div>
-            <div class="activity-content">
-              <p v-html="getActivityMessage(activity)"></p>
-              <span class="activity-time">{{ formatTime(activity.timestamp) }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Statistics Overview -->
-      <div class="statistics-overview">
-        <h2 class="section-title">Statistics Overview</h2>
-        <div class="stats-grid">
-          <div class="stat-chart">
-            <div class="chart-header">
-              <h3>Content Distribution</h3>
-              <span class="chart-value">{{ totalContent }} items</span>
-            </div>
-            <div class="chart-content">
-              <div class="chart-bars">
-                <div
-                  class="chart-bar"
-                  :style="getChartBarStyle('articles')"
-                >
-                  <span class="bar-label">Articles ({{ stats.articles }})</span>
-                </div>
-                <div
-                  class="chart-bar"
-                  :style="getChartBarStyle('categories')"
-                >
-                  <span class="bar-label">Categories ({{ stats.categories }})</span>
-                </div>
-                <div
-                  class="chart-bar"
-                  :style="getChartBarStyle('users')"
-                >
-                  <span class="bar-label">Users ({{ stats.users }})</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="stat-metrics">
-            <div class="metric-card">
-              <div class="metric-icon">📊</div>
-              <div class="metric-info">
-                <div class="metric-value">{{ totalContent }}</div>
-                <div class="metric-label">Total Content</div>
-              </div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-icon">📝</div>
-              <div class="metric-info">
-                <div class="metric-value">{{ stats.articlesWithContent }}</div>
-                <div class="metric-label">Articles with Content</div>
-              </div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-icon">⭐</div>
-              <div class="metric-info">
-                <div class="metric-value">{{ stats.recentItems }}</div>
-                <div class="metric-label">Recent Items (7 days)</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- System Status -->
-      <div class="system-status">
-        <h2 class="section-title">System Status</h2>
-        <div class="status-grid">
-          <div class="status-card" :class="{ 'online': systemStatus.api }">
-            <div class="status-icon">{{ systemStatus.api ? '🟢' : '🔴' }}</div>
-            <div class="status-content">
-              <h3>API Server</h3>
-              <p>{{ systemStatus.api ? 'Connected and running' : 'Disconnected' }}</p>
-            </div>
-          </div>
-          <div class="status-card online">
-            <div class="status-icon">🟢</div>
-            <div class="status-content">
-              <h3>Database</h3>
-              <p>Healthy and responsive</p>
-            </div>
-          </div>
-          <div class="status-card online">
-            <div class="status-icon">🟢</div>
-            <div class="status-content">
-              <h3>Storage</h3>
-              <p>{{ storageUsage }}% capacity available</p>
-            </div>
-          </div>
-          <div class="status-card" :class="{ 'online': systemStatus.performance }">
-            <div class="status-icon">{{ systemStatus.performance ? '⚡' : '🐢' }}</div>
-            <div class="status-content">
-              <h3>Performance</h3>
-              <p>{{ systemStatus.performance ? 'Optimal response time' : 'Slow response' }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { ref, onMounted, computed, onUnmounted } from 'vue';
 import {
@@ -443,6 +233,216 @@ onUnmounted(() => {
   }
 });
 </script>
+
+<template>
+  <div class="dashboard-container">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <div class="header-content">
+        <h1 class="dashboard-title">
+          <span class="title-icon">🚀</span>
+          Admin Dashboard
+        </h1>
+        <p class="dashboard-subtitle">Welcome to your content management system</p>
+      </div>
+      <div class="header-stats">
+        <div class="stat-card">
+          <div class="stat-icon">📁</div>
+          <div class="stat-info">
+            <div class="stat-number">{{ stats.categories }}</div>
+            <div class="stat-label">Categories</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📄</div>
+          <div class="stat-info">
+            <div class="stat-number">{{ stats.articles }}</div>
+            <div class="stat-label">Articles</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <div class="stat-number">{{ stats.users }}</div>
+            <div class="stat-label">Users</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div v-if="loading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Loading dashboard data...</p>
+    </div>
+
+    <!-- Content when data is loaded -->
+    <div v-else>
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <h2 class="section-title">Quick Actions</h2>
+        <div class="actions-grid">
+          <router-link to="/categories" class="action-card">
+            <div class="action-icon">📁</div>
+            <div class="action-content">
+              <h3>Manage Categories</h3>
+              <p>Organize your content categories</p>
+            </div>
+            <div class="action-arrow">→</div>
+          </router-link>
+
+          <router-link to="/articles" class="action-card">
+            <div class="action-icon">📄</div>
+            <div class="action-content">
+              <h3>Manage Articles</h3>
+              <p>Create and edit blog articles</p>
+            </div>
+            <div class="action-arrow">→</div>
+          </router-link>
+
+          <router-link to="/users" class="action-card">
+            <div class="action-icon">👥</div>
+            <div class="action-content">
+              <h3>Manage Users</h3>
+              <p>Handle user accounts and permissions</p>
+            </div>
+            <div class="action-arrow">→</div>
+          </router-link>
+
+          <div class="action-card" @click="openQuickModal">
+            <div class="action-icon">⚡</div>
+            <div class="action-content">
+              <h3>Quick Add</h3>
+              <p>Create new content quickly</p>
+            </div>
+            <div class="action-arrow">+</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="recent-activity">
+        <div class="activity-header">
+          <h2 class="section-title">Recent Activity</h2>
+          <button class="view-all-btn" @click="refreshData">Refresh ↻</button>
+        </div>
+
+        <div v-if="recentActivity.length === 0" class="empty-activity">
+          <div class="empty-icon">📊</div>
+          <p>No recent activity</p>
+        </div>
+
+        <div v-else class="activity-list">
+          <div
+            v-for="(activity, index) in recentActivity"
+            :key="index"
+            class="activity-item"
+          >
+            <div class="activity-icon">{{ getActivityIcon(activity.type) }}</div>
+            <div class="activity-content">
+              <p v-html="getActivityMessage(activity)"></p>
+              <span class="activity-time">{{ formatTime(activity.timestamp) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistics Overview -->
+      <div class="statistics-overview">
+        <h2 class="section-title">Statistics Overview</h2>
+        <div class="stats-grid">
+          <div class="stat-chart">
+            <div class="chart-header">
+              <h3>Content Distribution</h3>
+              <span class="chart-value">{{ totalContent }} items</span>
+            </div>
+            <div class="chart-content">
+              <div class="chart-bars">
+                <div
+                  class="chart-bar"
+                  :style="getChartBarStyle('articles')"
+                >
+                  <span class="bar-label">Articles ({{ stats.articles }})</span>
+                </div>
+                <div
+                  class="chart-bar"
+                  :style="getChartBarStyle('categories')"
+                >
+                  <span class="bar-label">Categories ({{ stats.categories }})</span>
+                </div>
+                <div
+                  class="chart-bar"
+                  :style="getChartBarStyle('users')"
+                >
+                  <span class="bar-label">Users ({{ stats.users }})</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-metrics">
+            <div class="metric-card">
+              <div class="metric-icon">📊</div>
+              <div class="metric-info">
+                <div class="metric-value">{{ totalContent }}</div>
+                <div class="metric-label">Total Content</div>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon">📝</div>
+              <div class="metric-info">
+                <div class="metric-value">{{ stats.articlesWithContent }}</div>
+                <div class="metric-label">Articles with Content</div>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon">⭐</div>
+              <div class="metric-info">
+                <div class="metric-value">{{ stats.recentItems }}</div>
+                <div class="metric-label">Recent Items (7 days)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Status -->
+      <div class="system-status">
+        <h2 class="section-title">System Status</h2>
+        <div class="status-grid">
+          <div class="status-card" :class="{ 'online': systemStatus.api }">
+            <div class="status-icon">{{ systemStatus.api ? '🟢' : '🔴' }}</div>
+            <div class="status-content">
+              <h3>API Server</h3>
+              <p>{{ systemStatus.api ? 'Connected and running' : 'Disconnected' }}</p>
+            </div>
+          </div>
+          <div class="status-card online">
+            <div class="status-icon">🟢</div>
+            <div class="status-content">
+              <h3>Database</h3>
+              <p>Healthy and responsive</p>
+            </div>
+          </div>
+          <div class="status-card online">
+            <div class="status-icon">🟢</div>
+            <div class="status-content">
+              <h3>Storage</h3>
+              <p>{{ storageUsage }}% capacity available</p>
+            </div>
+          </div>
+          <div class="status-card" :class="{ 'online': systemStatus.performance }">
+            <div class="status-icon">{{ systemStatus.performance ? '⚡' : '🐢' }}</div>
+            <div class="status-content">
+              <h3>Performance</h3>
+              <p>{{ systemStatus.performance ? 'Optimal response time' : 'Slow response' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 /* Base Styles */

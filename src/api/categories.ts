@@ -12,10 +12,9 @@ function getAuthHeaders() {
 export const getCategoriesAPI = async (): Promise<Category[]> => {
   const res = await axios.get(`${API_BASE}/blog/category`, { headers: getAuthHeaders() });
 
-  // Debug struktur response
+
   console.log('API Response structure:', res.data);
 
-  // Handle berbagai kemungkinan struktur response
   if (Array.isArray(res.data)) {
     return res.data;
   } else if (res.data.categories && Array.isArray(res.data.categories)) {

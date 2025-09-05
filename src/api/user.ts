@@ -1,4 +1,3 @@
-// src/api/users.ts
 import axios from 'axios';
 import type { Group } from '@/types';
 
@@ -12,8 +11,6 @@ function getAuthHeaders() {
     'Content-Type': 'application/json'
   };
 }
-
-// Types
 export interface User {
   id: string;
   username: string;

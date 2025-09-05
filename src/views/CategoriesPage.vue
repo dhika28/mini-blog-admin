@@ -1,3 +1,85 @@
+<script lang="ts" setup>
+import { ref, onMounted, computed } from 'vue';
+import type { Category } from '@/types';
+import { getCategoriesAPI, deleteCategoryAPI } from '@/api/categories';
+import type { AxiosError } from 'axios';
+import CategoryModal from '@/components/CategoryModal.vue';
+
+const categories = ref<Category[]>([]);
+const showModal = ref(false);
+const selectedCategory = ref<Category | null>(null);
+const loading = ref(true);
+const hoverItem = ref<string | null>(null);
+const searchQuery = ref('');
+
+const viewMode = ref<'grid' | 'list'>('grid')
+// Computed properties
+const filteredCategories = computed(() => {
+  if (!searchQuery.value.trim()) return categories.value;
+
+  return categories.value.filter(cat =>
+    cat.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+    cat.slug.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+    (cat.description && cat.description.toLowerCase().includes(searchQuery.value.toLowerCase()))
+  );
+});
+
+const categoriesWithDescription = computed(() => {
+  return categories.value.filter(cat => cat.description && cat.description.trim()).length;
+});
+
+const recentCategories = computed(() => {
+  // Simple recent count - you can enhance this with actual timestamps
+  return Math.min(categories.value.length, 5);
+});
+
+const fetchCategories = async () => {
+  try {
+    loading.value = true;
+    const data = await getCategoriesAPI();
+    categories.value = data;
+  } catch (err) {
+    const axiosErr = err as AxiosError<{ detail?: string }>;
+    console.error('Failed to fetch categories:', axiosErr.response?.data || axiosErr.message);
+    alert('Failed to load categories. Check console.');
+  } finally {
+    loading.value = false;
+  }
+};
+
+const openAddModal = () => {
+  selectedCategory.value = null;
+  showModal.value = true;
+};
+
+const openEditModal = (cat: Category) => {
+  selectedCategory.value = cat;
+  showModal.value = true;
+};
+
+const closeModal = () => {
+  showModal.value = false;
+  selectedCategory.value = null;
+};
+
+const deleteCategory = async (id: string) => {
+  if (!confirm('Are you sure you want to delete this category? This action cannot be undone.')) return;
+
+  try {
+    await deleteCategoryAPI(id);
+    await fetchCategories();
+  } catch (err) {
+    const axiosErr = err as AxiosError<{ detail?: string }>;
+    console.error('Delete category error:', axiosErr.response?.data || axiosErr.message);
+    alert(`Failed to delete category: ${axiosErr.response?.data?.detail || axiosErr.message}`);
+  }
+};
+
+onMounted(() => {
+  fetchCategories();
+});
+</script>
+
 <template>
   <div class="categories-container">
     <div class="categories-inner">
@@ -179,88 +261,6 @@
     />
   </div>
 </template>
-
-<script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue';
-import type { Category } from '@/types';
-import { getCategoriesAPI, deleteCategoryAPI } from '@/api/categories';
-import type { AxiosError } from 'axios';
-import CategoryModal from '@/components/CategoryModal.vue';
-
-const categories = ref<Category[]>([]);
-const showModal = ref(false);
-const selectedCategory = ref<Category | null>(null);
-const loading = ref(true);
-const hoverItem = ref<string | null>(null);
-const searchQuery = ref('');
-
-const viewMode = ref<'grid' | 'list'>('grid')
-// Computed properties
-const filteredCategories = computed(() => {
-  if (!searchQuery.value.trim()) return categories.value;
-
-  return categories.value.filter(cat =>
-    cat.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    cat.slug.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    (cat.description && cat.description.toLowerCase().includes(searchQuery.value.toLowerCase()))
-  );
-});
-
-const categoriesWithDescription = computed(() => {
-  return categories.value.filter(cat => cat.description && cat.description.trim()).length;
-});
-
-const recentCategories = computed(() => {
-  // Simple recent count - you can enhance this with actual timestamps
-  return Math.min(categories.value.length, 5);
-});
-
-const fetchCategories = async () => {
-  try {
-    loading.value = true;
-    const data = await getCategoriesAPI();
-    categories.value = data;
-  } catch (err) {
-    const axiosErr = err as AxiosError<{ detail?: string }>;
-    console.error('Failed to fetch categories:', axiosErr.response?.data || axiosErr.message);
-    alert('Failed to load categories. Check console.');
-  } finally {
-    loading.value = false;
-  }
-};
-
-const openAddModal = () => {
-  selectedCategory.value = null;
-  showModal.value = true;
-};
-
-const openEditModal = (cat: Category) => {
-  selectedCategory.value = cat;
-  showModal.value = true;
-};
-
-const closeModal = () => {
-  showModal.value = false;
-  selectedCategory.value = null;
-};
-
-const deleteCategory = async (id: string) => {
-  if (!confirm('Are you sure you want to delete this category? This action cannot be undone.')) return;
-
-  try {
-    await deleteCategoryAPI(id);
-    await fetchCategories();
-  } catch (err) {
-    const axiosErr = err as AxiosError<{ detail?: string }>;
-    console.error('Delete category error:', axiosErr.response?.data || axiosErr.message);
-    alert(`Failed to delete category: ${axiosErr.response?.data?.detail || axiosErr.message}`);
-  }
-};
-
-onMounted(() => {
-  fetchCategories();
-});
-</script>
 
 <style scoped>
 .categories-container {

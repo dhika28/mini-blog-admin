@@ -1,4 +1,3 @@
-// articles.ts
 import axios from 'axios';
 import type { Article, ArticleCreateRequest, ArticleUpdateRequest, Category } from '@/types';
 
@@ -12,8 +11,6 @@ function getAuthHeaders() {
     'Content-Type': 'application/json'
   };
 }
-
-// Hapus interface duplikat di sini, gunakan yang dari types.ts
 
 // API Functions
 export const getArticlesAPI = async (): Promise<Article[]> => {

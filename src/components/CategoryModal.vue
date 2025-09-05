@@ -1,77 +1,3 @@
-<template>
-  <transition name="modal">
-    <div v-if="show" class="modal-backdrop" @click.self="closeModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>{{ category ? 'Edit Category' : 'Create New Category' }}</h2>
-          <button class="close-btn" @click="closeModal">
-            <span>×</span>
-          </button>
-        </div>
-
-        <form @submit.prevent="saveCategory" class="modal-form">
-          <div class="form-group">
-            <label for="name">Name *</label>
-            <input
-              id="name"
-              v-model="formData.name"
-              type="text"
-              placeholder="Enter category name"
-              required
-              class="form-input"
-              :class="{ 'has-value': formData.name }"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="slug">Slug *</label>
-            <input
-              id="slug"
-              v-model="formData.slug"
-              type="text"
-              placeholder="Enter category slug"
-              required
-              class="form-input"
-              :class="{ 'has-value': formData.slug }"
-            />
-            <small class="help-text">URL-friendly version of the name</small>
-          </div>
-
-          <div class="form-group">
-            <label for="description">Description</label>
-            <textarea
-              id="description"
-              v-model="formData.description"
-              placeholder="Enter category description (optional)"
-              rows="4"
-              class="form-textarea"
-              :class="{ 'has-value': formData.description }"
-            ></textarea>
-          </div>
-
-          <div class="form-actions">
-            <button
-              type="button"
-              @click="closeModal"
-              class="btn-cancel"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              :disabled="!isFormValid"
-              :class="['btn-submit', { 'disabled': !isFormValid }]"
-            >
-              <span class="submit-icon">{{ category ? '🔄' : '✨' }}</span>
-              {{ category ? 'Update' : 'Create' }} Category
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </transition>
-</template>
-
 <script lang="ts" setup>
 import { ref, computed, watch, nextTick } from 'vue';
 import type { Category, CategoryCreateRequest, CategoryUpdateRequest } from '@/types';
@@ -165,8 +91,81 @@ const saveCategory = async () => {
 };
 </script>
 
+<template>
+  <transition name="modal">
+    <div v-if="show" class="modal-backdrop" @click.self="closeModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>{{ category ? 'Edit Category' : 'Create New Category' }}</h2>
+          <button class="close-btn" @click="closeModal">
+            <span>×</span>
+          </button>
+        </div>
+
+        <form @submit.prevent="saveCategory" class="modal-form">
+          <div class="form-group">
+            <label for="name">Name *</label>
+            <input
+              id="name"
+              v-model="formData.name"
+              type="text"
+              placeholder="Enter category name"
+              required
+              class="form-input"
+              :class="{ 'has-value': formData.name }"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="slug">Slug *</label>
+            <input
+              id="slug"
+              v-model="formData.slug"
+              type="text"
+              placeholder="Enter category slug"
+              required
+              class="form-input"
+              :class="{ 'has-value': formData.slug }"
+            />
+            <small class="help-text">URL-friendly version of the name</small>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea
+              id="description"
+              v-model="formData.description"
+              placeholder="Enter category description (optional)"
+              rows="4"
+              class="form-textarea"
+              :class="{ 'has-value': formData.description }"
+            ></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button
+              type="button"
+              @click="closeModal"
+              class="btn-cancel"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              :disabled="!isFormValid"
+              :class="['btn-submit', { 'disabled': !isFormValid }]"
+            >
+              <span class="submit-icon">{{ category ? '🔄' : '✨' }}</span>
+              {{ category ? 'Update' : 'Create' }} Category
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </transition>
+</template>
+
 <style scoped>
-/* Modal Transition */
 .modal-enter-active,
 .modal-leave-active {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

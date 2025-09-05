@@ -1,3 +1,101 @@
+<script lang="ts" setup>
+import { ref, onMounted, computed } from 'vue';
+import type { Article } from '@/types';
+import { getArticlesAPI, deleteArticleAPI } from '@/api/articles';
+import ArticleModal from '@/components/ArticleModal.vue';
+
+const articles = ref<Article[]>([]);
+const modalVisible = ref(false);
+const selectedArticle = ref<Article | null>(null);
+const loading = ref(true);
+const hoverCard = ref<string | null>(null);
+const searchQuery = ref('');
+
+// Computed properties
+const filteredArticles = computed(() => {
+  if (!searchQuery.value.trim()) return articles.value;
+
+  return articles.value.filter(article =>
+    article.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+    article.slug.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+    article.body.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+    (article.blog_category?.name.toLowerCase().includes(searchQuery.value.toLowerCase()))
+  );
+});
+
+const articlesWithCategory = computed(() => {
+  return articles.value.filter(article => article.blog_category).length;
+});
+
+const publishedArticles = computed(() => {
+  return articles.value.filter(article => article.published_at).length;
+});
+
+const articlesWithThumbnail = computed(() => {
+  return articles.value.filter(article => article.thumbnail_url).length;
+});
+
+// Methods
+const fetchArticles = async () => {
+  try {
+    loading.value = true;
+    articles.value = await getArticlesAPI();
+  } catch (err) {
+    console.error('Failed to fetch articles:', err);
+    alert('Failed to load articles. Check console.');
+  } finally {
+    loading.value = false;
+  }
+};
+
+const formatDate = (dateString: string | null) => {
+  if (!dateString) return 'Not published';
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
+const truncateText = (text: string, length: number) => {
+  if (!text) return 'No content';
+  if (text.length <= length) return text;
+  return text.substring(0, length) + '...';
+};
+
+const handleImageError = (event: Event) => {
+  const img = event.target as HTMLImageElement;
+  img.style.display = 'none';
+  img.parentElement?.classList.add('error');
+};
+
+const openModal = (article: Article | null) => {
+  selectedArticle.value = article;
+  modalVisible.value = true;
+};
+
+const closeModal = () => {
+  modalVisible.value = false;
+  selectedArticle.value = null;
+};
+
+const deleteArticle = async (id: string) => {
+  if (!confirm('Are you sure you want to delete this article? This action cannot be undone.')) return;
+
+  try {
+    await deleteArticleAPI(id);
+    await fetchArticles();
+  } catch (err) {
+    console.error('Delete article error:', err);
+    alert('Failed to delete article. Check console.');
+  }
+};
+
+onMounted(() => {
+  fetchArticles();
+});
+</script>
+
 <template>
   <div class="dashboard-container">
     <!-- Dashboard Header -->
@@ -158,104 +256,6 @@
     />
   </div>
 </template>
-
-<script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue';
-import type { Article } from '@/types';
-import { getArticlesAPI, deleteArticleAPI } from '@/api/articles';
-import ArticleModal from '@/components/ArticleModal.vue';
-
-const articles = ref<Article[]>([]);
-const modalVisible = ref(false);
-const selectedArticle = ref<Article | null>(null);
-const loading = ref(true);
-const hoverCard = ref<string | null>(null);
-const searchQuery = ref('');
-
-// Computed properties
-const filteredArticles = computed(() => {
-  if (!searchQuery.value.trim()) return articles.value;
-
-  return articles.value.filter(article =>
-    article.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    article.slug.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    article.body.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    (article.blog_category?.name.toLowerCase().includes(searchQuery.value.toLowerCase()))
-  );
-});
-
-const articlesWithCategory = computed(() => {
-  return articles.value.filter(article => article.blog_category).length;
-});
-
-const publishedArticles = computed(() => {
-  return articles.value.filter(article => article.published_at).length;
-});
-
-const articlesWithThumbnail = computed(() => {
-  return articles.value.filter(article => article.thumbnail_url).length;
-});
-
-// Methods
-const fetchArticles = async () => {
-  try {
-    loading.value = true;
-    articles.value = await getArticlesAPI();
-  } catch (err) {
-    console.error('Failed to fetch articles:', err);
-    alert('Failed to load articles. Check console.');
-  } finally {
-    loading.value = false;
-  }
-};
-
-const formatDate = (dateString: string | null) => {
-  if (!dateString) return 'Not published';
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  });
-};
-
-const truncateText = (text: string, length: number) => {
-  if (!text) return 'No content';
-  if (text.length <= length) return text;
-  return text.substring(0, length) + '...';
-};
-
-const handleImageError = (event: Event) => {
-  const img = event.target as HTMLImageElement;
-  img.style.display = 'none';
-  img.parentElement?.classList.add('error');
-};
-
-const openModal = (article: Article | null) => {
-  selectedArticle.value = article;
-  modalVisible.value = true;
-};
-
-const closeModal = () => {
-  modalVisible.value = false;
-  selectedArticle.value = null;
-};
-
-const deleteArticle = async (id: string) => {
-  if (!confirm('Are you sure you want to delete this article? This action cannot be undone.')) return;
-
-  try {
-    await deleteArticleAPI(id);
-    await fetchArticles();
-  } catch (err) {
-    console.error('Delete article error:', err);
-    alert('Failed to delete article. Check console.');
-  }
-};
-
-onMounted(() => {
-  fetchArticles();
-});
-</script>
 
 <style scoped>
 .dashboard-container {

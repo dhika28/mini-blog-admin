@@ -5,16 +5,13 @@ const route = useRoute()
 const router = useRouter()
 
 const handleLogout = () => {
-  // Kalau ada auth/token di localStorage atau cookie, hapus di sini
   localStorage.removeItem("token")
 
-  // Redirect ke login
   router.push("/login")
 }
 </script>
 
 <template>
-  <!-- Header hanya tampil kalau bukan di login -->
   <header v-if="route.fullPath !== '/login'" class="header">
     <div class="container">
       <RouterLink to="/" class="logo">
@@ -34,7 +31,6 @@ const handleLogout = () => {
   </header>
 
   <main>
-    <!-- Tambahkan key supaya halaman selalu dirender ulang saat route berubah -->
     <RouterView :key="route.fullPath" />
   </main>
 </template>

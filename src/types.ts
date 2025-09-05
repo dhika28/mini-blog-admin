@@ -1,7 +1,6 @@
-// @/types/index.ts
 
 export interface Category {
-  id: string; // UUID from Django
+  id: string;
   slug: string;
   name: string;
   description?: string | null;
@@ -51,16 +50,13 @@ export interface ArticleCreateRequest {
   blog_category?: string | null;
 }
 
-// SOLUSI 1: Tambahkan setidaknya satu property (rekomendasi)
 export interface ArticleUpdateRequest extends Partial<ArticleCreateRequest> {
-  // Tambahkan property opsional untuk update
   modified_at?: string;
 }
 
 export interface Group {
   id: string;
   name: string;
-  // Add other group properties if needed
 }
 
 export interface User {
