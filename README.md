@@ -1,6 +1,6 @@
 # mini-blog-admin
 
-This template should help get you started developing with Vue 3 in Vite.
+Seamless connection between Vue.js frontend and a backend API for hands-on learning and experimentation.
 
 ## Recommended IDE Setup
 
